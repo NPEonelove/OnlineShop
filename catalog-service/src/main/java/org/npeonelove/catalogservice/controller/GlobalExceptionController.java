@@ -1,0 +1,73 @@
+package org.npeonelove.catalogservice.controller;
+
+import org.npeonelove.catalogservice.exception.CategoryErrorResponse;
+import org.npeonelove.catalogservice.exception.PhotoErrorResponse;
+import org.npeonelove.catalogservice.exception.ProductErrorResponse;
+import org.npeonelove.catalogservice.exception.category.CategoryAlreadyExistsException;
+import org.npeonelove.catalogservice.exception.category.CategoryNotCreatedException;
+import org.npeonelove.catalogservice.exception.category.CategoryNotEditedException;
+import org.npeonelove.catalogservice.exception.category.CategoryNotExistsException;
+import org.npeonelove.catalogservice.exception.photo.PhotoNotExistsException;
+import org.npeonelove.catalogservice.exception.product.ProductAlreadyExistsException;
+import org.npeonelove.catalogservice.exception.product.ProductNotCreatedException;
+import org.npeonelove.catalogservice.exception.product.ProductNotEditedException;
+import org.npeonelove.catalogservice.exception.product.ProductNotExistsException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.Date;
+
+@ControllerAdvice
+public class GlobalExceptionController {
+
+    //product
+    @ExceptionHandler(ProductNotCreatedException.class)
+    public ResponseEntity<ProductErrorResponse> handleProductNotCreatedException(ProductNotCreatedException ex) {
+        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<ProductErrorResponse> handleProductNotCreatedException(ProductAlreadyExistsException ex) {
+        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), new Date()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ProductNotExistsException.class)
+    public ResponseEntity<ProductErrorResponse> handleProductNotExistsException(ProductNotExistsException ex) {
+        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), new Date()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductNotEditedException.class)
+    public ResponseEntity<ProductErrorResponse> handleProductNotExistsException(ProductNotEditedException ex) {
+        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), new Date()), HttpStatus.CONFLICT);
+    }
+
+    //category
+    @ExceptionHandler(CategoryNotCreatedException.class)
+    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotCreatedException ex) {
+        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), new Date()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CategoryNotExistsException.class)
+    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotExistsException ex) {
+        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), new Date()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryAlreadyExistsException ex) {
+        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), new Date()), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CategoryNotEditedException.class)
+    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotEditedException ex) {
+        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), new Date()), HttpStatus.NOT_FOUND);
+    }
+
+    //photo
+    @ExceptionHandler(PhotoNotExistsException.class)
+    public ResponseEntity<PhotoErrorResponse> handleProductNotExistsException(PhotoNotExistsException ex) {
+        return new ResponseEntity<>(new PhotoErrorResponse(ex.getMessage(), new Date()), HttpStatus.NOT_FOUND);
+    }
+
+}

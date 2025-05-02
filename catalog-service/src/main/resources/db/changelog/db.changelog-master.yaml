@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - include:
+      file: /db/changelog/versions/0.0.1-create-tables.sql
+  - include:
+      file: /db/changelog/versions/0.0.2-fix-tables.sql
+  - include:
+      file: /db/changelog/versions/0.0.3-mistake-table.sql
+  - include:
+      file: /db/changelog/versions/0.0.4-fix-table.sql
+  - include:
+      file: /db/changelog/versions/0.0.5-delete-manytomany-table.sql
+  - include:
+      file: /db/changelog/versions/0.0.6-fix-mistakes.sql
+  - include:
+      file: /db/changelog/versions/0.0.7-add-photos-db.sql
+  - include:
+      file: /db/changelog/versions/0.0.8-drop-photo_db.sql
+  - include:
+      file: /db/changelog/versions/0.0.9-add-constraint_rating.sql
+  - include:
+      file: /db/changelog/versions/0.1.0-forAdd-s3.sql
+  - include:
+      file: /db/changelog/versions/0.1.1-clear-data.sql
+  - include:
+      file: /db/changelog/versions/0.1.2-add-productphotos_db.sql
