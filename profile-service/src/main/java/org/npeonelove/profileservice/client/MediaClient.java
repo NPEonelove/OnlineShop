@@ -1,5 +1,4 @@
-package org.npeonelove.catalogservice.client;
-
+package org.npeonelove.profileservice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
