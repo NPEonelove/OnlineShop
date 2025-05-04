@@ -1,5 +1,8 @@
 package org.npeonelove.profileservice.model;
 
+import lombok.Getter;
+
+@Getter
 public enum ProfileRoleEnum {
     ADMIN("admin"),
     USER("user");
@@ -8,9 +11,5 @@ public enum ProfileRoleEnum {
 
     ProfileRoleEnum(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 }

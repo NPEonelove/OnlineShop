@@ -1,4 +1,4 @@
-package org.npeonelove.catalogservice.exception;
+package org.npeonelove.profileservice.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
-public class PhotoErrorResponse {
+public class ProfileErrorResponse {
     String message;
     Date timestamp;
 }

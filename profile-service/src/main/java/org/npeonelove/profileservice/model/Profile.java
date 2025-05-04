@@ -24,16 +24,16 @@ public class Profile {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "firstName", nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "lastName", nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "photoLink")
+    @Column(name = "photo_link")
     private String photoLink;
 
-    @Column(name = "regTime", nullable = false)
+    @Column(name = "reg_time", nullable = false)
     private Timestamp regTime;
 
     @Column(name = "role", nullable = false)

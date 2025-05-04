@@ -3,3 +3,13 @@ databaseChangeLog:
       file: /db/changelog/versions/profiles/0.0.1-create-table.sql
   - include:
       file: /db/changelog/versions/profiles/0.0.2-add-constraints.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.3-update-column_names.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.4-update-enum.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.5-update-table.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.6-update-sequense.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.7-test_update-sequense.sql
