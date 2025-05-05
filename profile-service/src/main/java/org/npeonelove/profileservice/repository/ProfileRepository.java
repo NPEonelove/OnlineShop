@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     Profile findProfileById(long id);
+
+    Profile findProfileByEmail(String email);
 }
