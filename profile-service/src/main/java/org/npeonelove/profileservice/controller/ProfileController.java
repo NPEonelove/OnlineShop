@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequestMapping("/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
@@ -40,5 +41,11 @@ public class ProfileController {
     @GetMapping("/{id}")
     public ResponseEntity<GetProfile> getProfile(@PathVariable("id") int id) {
         return ResponseEntity.ok(profileService.getProfile(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteProfile(@PathVariable("id") int id) {
+        profileService.deleteProfile(id);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }

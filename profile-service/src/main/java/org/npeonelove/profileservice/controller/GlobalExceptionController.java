@@ -1,6 +1,7 @@
 package org.npeonelove.profileservice.controller;
 
 import org.npeonelove.profileservice.exception.ProfileErrorResponse;
+import org.npeonelove.profileservice.exception.profile.ProfileDoesNotExistException;
 import org.npeonelove.profileservice.exception.profile.ProfileNotCreatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,11 @@ public class GlobalExceptionController {
     //profile
     @ExceptionHandler(ProfileNotCreatedException.class)
     public ResponseEntity<ProfileErrorResponse> handleProductNotCreatedException(ProfileNotCreatedException ex) {
+        return new ResponseEntity<>(new ProfileErrorResponse(ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProfileDoesNotExistException.class)
+    public ResponseEntity<ProfileErrorResponse> handleProductNotCreatedException(ProfileDoesNotExistException ex) {
         return new ResponseEntity<>(new ProfileErrorResponse(ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
     }
 }
