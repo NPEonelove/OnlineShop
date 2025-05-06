@@ -21,5 +21,6 @@ public interface ProfileClient {
 //    @DeleteMapping(value = "/media")
 //    String deleteMedia(@RequestParam("keys") String[] keys);
 
-
+    @PostMapping(value = "/profile")
+    void createProfile();
 }
