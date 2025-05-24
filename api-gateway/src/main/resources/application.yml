@@ -15,3 +15,9 @@ spring:
               http://localhost:8084
             predicates:
               - Path=/profile/**
+          - id: auth-service
+            uri:
+              http://localhost:8085
+            predicates:
+              - Path=/auth/**
+              - Path=/user/**

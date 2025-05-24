@@ -3,10 +3,7 @@ package org.npeonelove.profileservice.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.npeonelove.profileservice.client.MediaClient;
-import org.npeonelove.profileservice.dto.profile.CreateProfile;
-import org.npeonelove.profileservice.dto.profile.EditProfile;
-import org.npeonelove.profileservice.dto.profile.GetProfile;
-import org.npeonelove.profileservice.dto.profile.ValidateProfile;
+import org.npeonelove.profileservice.dto.profile.*;
 import org.npeonelove.profileservice.exception.profile.ProfileDoesNotExistException;
 import org.npeonelove.profileservice.exception.profile.ProfileNotCreatedException;
 import org.npeonelove.profileservice.exception.profile.ProfileNotEditedException;
@@ -32,7 +29,7 @@ public class ProfileService {
     private final String s3Directory = "profile/profilePhoto";
 
     @Transactional
-    public void createProfile(CreateProfile createProfile) {
+    public void createProfile(ProfileCredentials createProfile) {
         Profile profile = modelMapper.map(createProfile, Profile.class);
         if (profileRepository.existsById(profile.getId())) {
             throw new ProfileNotCreatedException("Profile already exists");
@@ -43,7 +40,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public void createProfile(CreateProfile createProfile, MultipartFile file) {
+    public void createProfile(ProfileCredentials createProfile, MultipartFile file) {
         Profile profile = modelMapper.map(createProfile, Profile.class);
         if (profileRepository.existsById(profile.getId())) {
             throw new ProfileNotCreatedException("Profile already exists");
@@ -118,6 +115,15 @@ public class ProfileService {
         } else {
             return true;
         }
+    }
+
+    public Profile getProfileByEmail(String email) {
+        Profile profile = profileRepository.findProfileByEmail(email);
+        if (profile == null) {
+            throw new ProfileDoesNotExistException("Profile does not exist");
+        }
+        return profile;
+//        return modelMapper.map(profile, GetProfile.class);
     }
 }
 

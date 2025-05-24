@@ -13,3 +13,7 @@ databaseChangeLog:
       file: /db/changelog/versions/profiles/0.0.6-update-sequense.sql
   - include:
       file: /db/changelog/versions/profiles/0.0.7-test_update-sequense.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.8-edit-constraints.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.9-remove-passwordLengthLimit.sql
