@@ -1,4 +1,4 @@
-package org.npeonelove.authservice.model;
+package org.npeonelove.authservice.model.jwt;
 
 import lombok.Data;
 

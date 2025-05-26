@@ -1,6 +1,6 @@
-package org.npeonelove.authservice.security;
+package org.npeonelove.profileservice.security;
 
-import org.npeonelove.authservice.model.profile.ProfileCredentials;
+import org.npeonelove.profileservice.dto.profile.ProfileCredentials;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -42,5 +42,4 @@ public record CustomUserDetails(ProfileCredentials userCredentials) implements U
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
-
 }

@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.npeonelove.authservice.model.JwtAuthenticationDTO;
+import org.npeonelove.authservice.model.jwt.JwtAuthenticationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,17 +19,17 @@ public class JwtService {
     @Value("${jwt.secret-key}")
     private String jwtSecret;
 
-    public JwtAuthenticationDTO generateAuthToken(String email) {
+    public JwtAuthenticationDTO generateAuthToken(String email, String role) {
         JwtAuthenticationDTO jwtDTO = new JwtAuthenticationDTO();
-        jwtDTO.setToken(generateJwtToken(email));
-        jwtDTO.setRefreshToken(generateRefreshToken(email));
+        jwtDTO.setToken(generateJwtToken(email, role));
+        jwtDTO.setRefreshToken(generateRefreshToken(email, role));
         return jwtDTO;
     }
 
     // обновление jwt токена
-    public JwtAuthenticationDTO refreshBaseToken(String email, String refreshToken) {
+    public JwtAuthenticationDTO refreshBaseToken(String email, String role, String refreshToken) {
         JwtAuthenticationDTO jwtDTO = new JwtAuthenticationDTO();
-        jwtDTO.setToken(generateJwtToken(email));
+        jwtDTO.setToken(generateJwtToken(email, role));
         jwtDTO.setRefreshToken(refreshToken);
         return jwtDTO;
     }
@@ -44,6 +44,7 @@ public class JwtService {
         return claims.getSubject();
     }
 
+    // проверка токена
     public boolean validateToken(String token) {
         try {
             Jwts.parser().
@@ -59,21 +60,23 @@ public class JwtService {
         return false;
     }
 
-    // генерация jwt токена
-    private String generateJwtToken(String email) {
-        Date date = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+    // генерация base токена
+    private String generateJwtToken(String email, String role) {
+        Date date = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
+                .claim("role", role)
                 .expiration(date)
                 .signWith(getSignKey())
                 .compact();
     }
 
     // генерация refresh токена
-    private String generateRefreshToken(String email) {
+    private String generateRefreshToken(String email, String role) {
         Date date = Date.from(LocalDateTime.now().plusYears(1).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
+                .claim("role", role)
                 .expiration(date)
                 .signWith(getSignKey())
                 .compact();

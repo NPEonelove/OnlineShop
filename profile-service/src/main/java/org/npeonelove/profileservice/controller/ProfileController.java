@@ -104,7 +104,7 @@ public class ProfileController {
         return profileService.validateProfileCredentials(validateProfile);
     }
 
-    @GetMapping
+    @GetMapping("/get-profile-by-email")
     public ResponseEntity<Profile> getProfileByEmail(@RequestParam("email") String email) {
         return ResponseEntity.ok(profileService.getProfileByEmail(email));
     }

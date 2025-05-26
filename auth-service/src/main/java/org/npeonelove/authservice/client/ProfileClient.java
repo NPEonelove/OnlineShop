@@ -1,7 +1,7 @@
 package org.npeonelove.authservice.client;
 
-import org.npeonelove.authservice.model.Profile;
-import org.npeonelove.authservice.model.ProfileCredentials;
+import org.npeonelove.authservice.model.profile.Profile;
+import org.npeonelove.authservice.model.profile.ProfileCredentials;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ public interface ProfileClient {
 //    @DeleteMapping(value = "/media")
 //    String deleteMedia(@RequestParam("keys") String[] keys);
 
-    @GetMapping(value = "/profile")
+    @GetMapping(value = "/profile/get-profile-by-email")
     Profile getProfile(@RequestParam("email") String email);
 
     @PostMapping(value = "/profile")
