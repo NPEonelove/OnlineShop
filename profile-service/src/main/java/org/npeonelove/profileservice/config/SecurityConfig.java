@@ -23,6 +23,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
+//    private final JwtService jwtService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,7 +32,15 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/profile/get-profile-by-email").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
+                                "/swagger-resources/**").permitAll()
+
+                        .requestMatchers("/profile/get-profile-by-email").permitAll()
+                        .requestMatchers("/profile/create-profile").permitAll()
+//                        .requestMatchers("/profile/get-profile-by-email")
+//                            .access(new WebExpressionAuthorizationManager("@jwtService.validateTokenFromRequest(request)"))
+//                        .requestMatchers("/profile")
+//                            .access(new WebExpressionAuthorizationManager("@jwtService.validateTokenFromRequest(request)"))
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

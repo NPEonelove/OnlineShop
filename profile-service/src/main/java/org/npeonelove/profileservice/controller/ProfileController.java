@@ -22,7 +22,7 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    @PostMapping
+    @PostMapping("/create-profile")
     public ResponseEntity<ProfileCredentials> createProfile(@RequestBody @Valid ProfileCredentials profileCredentials,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

@@ -15,6 +15,9 @@ public class CustomUserService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Profile profile = profileClient.getProfile(username);
+        if (profile.equals(new Profile())) {
+            return new CustomUserDetails(null);
+        }
         ProfileCredentials profileCredentials = new ProfileCredentials();
         profileCredentials.setEmail(profile.getEmail());
         profileCredentials.setPassword(profile.getPassword());

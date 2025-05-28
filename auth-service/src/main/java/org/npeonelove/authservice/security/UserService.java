@@ -3,9 +3,9 @@ package org.npeonelove.authservice.security;
 import lombok.RequiredArgsConstructor;
 import org.npeonelove.authservice.client.ProfileClient;
 import org.npeonelove.authservice.model.jwt.JwtAuthenticationDTO;
+import org.npeonelove.authservice.model.jwt.RefreshTokenDTO;
 import org.npeonelove.authservice.model.profile.Profile;
 import org.npeonelove.authservice.model.profile.ProfileCredentials;
-import org.npeonelove.authservice.model.jwt.RefreshTokenDTO;
 import org.npeonelove.authservice.model.profile.ProfileRoleEnum;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,9 @@ public class UserService {
 
     public JwtAuthenticationDTO signUp(ProfileCredentials profile) {
         profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-        profileClient.createProfile(profile);
-        return jwtService.generateAuthToken(profile.getEmail(), ProfileRoleEnum.USER.getValue());
+        JwtAuthenticationDTO jwtDTO = jwtService.generateAuthToken(profile.getEmail(), ProfileRoleEnum.USER.getValue());
+        profileClient.createProfile(profile, "Bearer " + jwtDTO.getToken());
+        return jwtDTO;
     }
 
     public JwtAuthenticationDTO refreshToken(RefreshTokenDTO refreshTokenDTO) throws AuthenticationException {
