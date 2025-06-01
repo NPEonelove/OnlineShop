@@ -9,13 +9,6 @@ import lombok.Setter;
 @Setter
 public class EditProfile {
 
-    @NotBlank(message = "Enter your email")
-    @Email(message = "Incorrect email")
-    private String email;
-
-    @NotBlank(message = "Enter your password")
-    private String password;
-
     @NotBlank(message = "Enter your first name")
     private String firstName;
 

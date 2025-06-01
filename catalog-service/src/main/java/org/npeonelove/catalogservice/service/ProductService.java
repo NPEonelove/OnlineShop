@@ -35,12 +35,6 @@ public class ProductService {
     private final MediaClient mediaClient;
 
     public List<GetCardProduct> getAllProducts() {
-//        List<GetCardProduct> products = new ArrayList<>();
-//        List<Product> productList = productRepository.findAll();
-//        for (Product product : productList) {
-//            GetCardProduct getCardProduct = new GetCardProduct();
-//            getCardProduct
-//        }
         return productRepository.findAll().stream().map(product ->
                 modelMapper.map(product, GetCardProduct.class)).collect(Collectors.toList());
     }

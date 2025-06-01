@@ -3,23 +3,31 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: auth-service
-            uri:
-              lb://AUTH-SERVICE
-            predicates:
-              - Path=/auth/**
-          - id: profile-service
-            uri:
-              lb://PROFILE-SERVICE
-            predicates:
-              - Path=/profile/**
+      routes:
+        - id: auth-service
+          uri:
+            lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+        - id: profile-service
+          uri:
+            lb://PROFILE-SERVICE
+          predicates:
+            - Path=/profile/**
+
+
+  main:
+    web-application-type: reactive
 
 server:
   port: 8080
+
+jwt:
+  secret-key: JWT_SECRET_KEY
+
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+

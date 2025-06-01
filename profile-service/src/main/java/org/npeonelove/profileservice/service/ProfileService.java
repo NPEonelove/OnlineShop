@@ -6,15 +6,14 @@ import org.npeonelove.profileservice.client.MediaClient;
 import org.npeonelove.profileservice.dto.profile.EditProfile;
 import org.npeonelove.profileservice.dto.profile.GetProfile;
 import org.npeonelove.profileservice.dto.profile.ProfileCredentials;
-import org.npeonelove.profileservice.dto.profile.ValidateProfile;
 import org.npeonelove.profileservice.exception.profile.ProfileDoesNotExistException;
+import org.npeonelove.profileservice.exception.profile.ProfileNotCreatedException;
 import org.npeonelove.profileservice.exception.profile.ProfileNotEditedException;
-import org.npeonelove.profileservice.exception.profile.ProfileValidateException;
 import org.npeonelove.profileservice.exception.security.PermissionException;
 import org.npeonelove.profileservice.model.Profile;
 import org.npeonelove.profileservice.model.ProfileRoleEnum;
 import org.npeonelove.profileservice.repository.ProfileRepository;
-import org.npeonelove.profileservice.security.JwtService;
+import org.npeonelove.profileservice.security.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,16 +30,16 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final ModelMapper modelMapper;
     private final MediaClient mediaClient;
-    private final JwtService jwtService;
+    private final SecurityContextService securityContextService;
     private final String s3Directory = "profile/profilePhoto";
 
     // для первичной регистрации пользователя по email и password
     @Transactional
     public void createProfile(ProfileCredentials createProfile) {
         Profile profile = modelMapper.map(createProfile, Profile.class);
-//        if (profileRepository.existsByEmail(profile.getEmail())) {
-//            throw new ProfileNotCreatedException("Profile already exists");
-//        }
+        if (profileRepository.existsByEmail(profile.getEmail())) {
+            throw new ProfileNotCreatedException("Profile already exists");
+        }
         profile.setRegTime(new Timestamp(System.currentTimeMillis()));
         profile.setRole(ProfileRoleEnum.USER.getValue());
         profileRepository.save(profile);
@@ -61,7 +60,7 @@ public class ProfileService {
         Profile profile = profileRepository.findProfileById(id);
         if (profile == null) {
             throw new ProfileDoesNotExistException("Profile does not exist");
-        } else if (!jwtService.getEmailFromSecurityContext().equals(profile.getEmail())) {
+        } else if (!securityContextService.getEmailFromSecurityContext().equals(profile.getEmail())) {
             throw new PermissionException("You don't have the rights to edit this user");
         }
         if (profile.getPhotoLink() != null) {
@@ -74,7 +73,7 @@ public class ProfileService {
     public void editProfile(int id, EditProfile editProfile, MultipartFile file) {
         if (profileRepository.findProfileById(id) == null) {
             throw new ProfileDoesNotExistException("Profile does not exist");
-        } else if (!profileRepository.findProfileById(id).getRole().equals(editProfile.getEmail())) {
+        } else if (!profileRepository.findProfileById(id).getEmail().equals(securityContextService.getEmailFromSecurityContext())) {
             throw new ProfileNotEditedException("Your email should be unique");
         } else {
             Profile profile = profileRepository.findProfileById(id);
@@ -95,23 +94,12 @@ public class ProfileService {
     public void editProfile(int id, EditProfile editProfile) {
         if (profileRepository.findProfileById(id) == null) {
             throw new ProfileDoesNotExistException("Profile does not exist");
-        } else if (!profileRepository.findProfileById(id).getRole().equals(editProfile.getEmail())) {
+        } else if (!profileRepository.findProfileById(id).getEmail().equals(securityContextService.getEmailFromSecurityContext())) {
             throw new ProfileNotEditedException("Your email should be unique");
         } else {
             Profile profile = profileRepository.findProfileById(id);
             modelMapper.map(editProfile, profile);
             profileRepository.save(profile);
-        }
-    }
-
-    public Boolean validateProfileCredentials(ValidateProfile validateProfile) {
-        Optional<Profile> profile = profileRepository.findProfileByEmail(validateProfile.getEmail());
-        if (profile.isEmpty()) {
-            throw new ProfileDoesNotExistException("Profile does not exist");
-        } else if (!profile.get().getPassword().equals(validateProfile.getPassword())) {
-            throw new ProfileValidateException("Passwords do not match");
-        } else {
-            return true;
         }
     }
 

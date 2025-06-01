@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 @Setter
 public class GetProfile {
     private String email;
-    private String password;
     private String firstName;
     private String lastName;
     private String photoLink;

@@ -27,7 +27,7 @@ public class UserService {
 
     public JwtAuthenticationDTO signUp(ProfileCredentials profile) {
         profile.setPassword(passwordEncoder.encode(profile.getPassword()));
-        JwtAuthenticationDTO jwtDTO = jwtService.generateAuthToken(profile.getEmail(), ProfileRoleEnum.USER.getValue());
+        JwtAuthenticationDTO jwtDTO = jwtService.generateAuthToken(profile.getEmail(), ProfileRoleEnum.USER.toString());
         profileClient.createProfile(profile, "Bearer " + jwtDTO.getToken());
         return jwtDTO;
     }

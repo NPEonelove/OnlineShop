@@ -5,7 +5,7 @@ import org.npeonelove.authservice.model.profile.ProfileCredentials;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "profile-client", url = "http://localhost:8080/profile")
+@FeignClient(name = "profile-client", url = "http://localhost:8084/profile")
 public interface ProfileClient {
 
     @GetMapping(value = "/get-profile-by-email")

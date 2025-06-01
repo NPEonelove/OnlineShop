@@ -36,30 +36,12 @@ public class ProfileController {
         return ResponseEntity.ok(profileCredentials);
     }
 
-//    @PostMapping
-//    public ResponseEntity<RegistrationProfile> createProfile(@ModelAttribute @Valid RegistrationProfile registrationProfile, MultipartFile file,
-//                                                             BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            StringBuilder errors = new StringBuilder();
-//            for (ObjectError error : bindingResult.getAllErrors()) {
-//                errors.append(error.getDefaultMessage()).append(". ");
-//            }
-//            throw new ProfileNotCreatedException(errors.toString());
-//        }
-//        if (file == null || file.isEmpty()) {
-//            profileService.createProfile(registrationProfile);
-//        } else {
-//            profileService.createProfile(registrationProfile, file);
-//        }
-//        return ResponseEntity.ok(registrationProfile);
-//    }
-
-    @GetMapping("/{id}")
+    @GetMapping("/get-profile-by-id/{id}")
     public ResponseEntity<GetProfile> getProfile(@PathVariable("id") int id) {
         return ResponseEntity.ok(profileService.getProfile(id));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/edit-profile-by-id/{id}")
     public ResponseEntity<HttpStatus> editProfile(@PathVariable("id") int id, @ModelAttribute @Valid EditProfile editProfile,
                                                   MultipartFile file, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -78,30 +60,10 @@ public class ProfileController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-profile-by-id/{id}")
     public ResponseEntity<HttpStatus> deleteProfile(@PathVariable("id") int id) {
         profileService.deleteProfile(id);
         return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-//    @PostMapping("/credentials/create-profile")
-//    public ResponseEntity<CreateProfile> createProfile(@Valid @RequestBody CreateProfile createProfile) {
-//
-//    }
-
-
-    @PostMapping("/validate-credentials")
-    public boolean validateProfileCredentials(@RequestBody @Valid ValidateProfile validateProfile,
-                                                              BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errors = new StringBuilder();
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                errors.append(error.getDefaultMessage()).append(". ");
-            }
-            throw new ProfileValidateException(errors.toString());
-        }
-
-        return profileService.validateProfileCredentials(validateProfile);
     }
 
     @GetMapping("/get-profile-by-email")
