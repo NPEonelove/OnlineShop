@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.npeonelove.authservice.model.jwt.JwtAuthenticationDTO;
+import org.npeonelove.authservice.dto.jwt.JwtAuthenticationDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -62,22 +62,21 @@ public class JwtService {
 
     // генерация base токена
     private String generateJwtToken(String email, String role) {
-        Date date = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
-        return Jwts.builder()
-                .subject(email)
-                .claim("role", role)
-                .expiration(date)
-                .signWith(getSignKey())
-                .compact();
+        Date expiration = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
+        return generateToken(email, role, expiration);
     }
 
     // генерация refresh токена
     private String generateRefreshToken(String email, String role) {
-        Date date = Date.from(LocalDateTime.now().plusYears(1).atZone(ZoneId.systemDefault()).toInstant());
+        Date expiration = Date.from(LocalDateTime.now().plusYears(1).atZone(ZoneId.systemDefault()).toInstant());
+        return generateToken(email, role, expiration);
+    }
+
+    private String generateToken(String email, String role, Date expiration) {
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
-                .expiration(date)
+                .expiration(expiration)
                 .signWith(getSignKey())
                 .compact();
     }

@@ -11,5 +11,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class ProductErrorResponse {
     String message;
+    int status;
     Date timestamp;
 }

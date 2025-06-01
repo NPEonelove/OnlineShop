@@ -1,4 +1,4 @@
-package org.npeonelove.catalogservice.exception;
+package org.npeonelove.authservice.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import lombok.Setter;
 
 import java.util.Date;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
-public class CategoryErrorResponse {
+public class AuthErrorResponse {
     String message;
     int status;
     Date timestamp;

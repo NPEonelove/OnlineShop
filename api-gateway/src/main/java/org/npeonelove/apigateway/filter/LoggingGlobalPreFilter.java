@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
+import java.util.List;
 
 @Component
 public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
@@ -23,12 +24,15 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
     @Value("${jwt.secret-key}")
     private String jwtSecret;
 
+    @Value("${security.public-paths}")
+    private List<String> publicPaths;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getPath().toString();
 
-        if (path.startsWith("/auth") || path.startsWith("/profile/get-profile-by-id/")) {
+        if (publicPaths.stream().anyMatch(path::startsWith)) {
             return chain.filter(exchange);
         }
 
@@ -43,11 +47,7 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
 
         try {
 
-            Jwts.parser()
-                    .verifyWith(getSignKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            parseJwt(token);
 
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                     .header("X-Profile-Email", getEmailFromToken(token))
@@ -69,21 +69,19 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
     }
 
     private String getEmailFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSignKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return claims.getSubject();
+        return parseJwt(token).getSubject();
     }
 
     private String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
+        return parseJwt(token).get("role", String.class);
+    }
+
+    private Claims parseJwt(String token) {
+        return Jwts.parser()
                 .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        return claims.get("role", String.class);
     }
 
     @Override
@@ -91,3 +89,5 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
         return 0;
     }
 }
+
+

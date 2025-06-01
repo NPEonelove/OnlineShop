@@ -31,8 +31,8 @@ public class ProductController {
     }
 
     @SneakyThrows
-    @PostMapping
-    public ResponseEntity<AddProduct> addProduct(@RequestParam(value = "file", required = false) MultipartFile file,
+    @PostMapping("/add-product")
+    public ResponseEntity<AddProduct> addProduct(@RequestParam(value = "image", required = false) MultipartFile file,
                                                  @ModelAttribute @Valid AddProduct addProduct, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -52,13 +52,13 @@ public class ProductController {
         return ResponseEntity.ok(addProduct);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-product-by-id/{id}")
     public ResponseEntity<GetFullProduct> getProduct(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateProduct(@PathVariable Long id, @RequestParam(value = "file", required = false) MultipartFile file,
+    @PatchMapping("/edit-product-by-id/{id}")
+    public ResponseEntity<HttpStatus> updateProduct(@PathVariable Long id, @RequestParam(value = "image", required = false) MultipartFile file,
                                                     @ModelAttribute @Valid EditProduct editProduct, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
@@ -77,7 +77,7 @@ public class ProductController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-product-by-id/{id}")
     public HttpStatus deleteProduct(@PathVariable("id") Long id) {
         productService.deleteProduct(id);
         return HttpStatus.OK;
