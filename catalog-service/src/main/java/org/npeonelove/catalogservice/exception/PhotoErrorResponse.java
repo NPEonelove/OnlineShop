@@ -11,5 +11,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class PhotoErrorResponse {
     String message;
+    int status;
     Date timestamp;
 }

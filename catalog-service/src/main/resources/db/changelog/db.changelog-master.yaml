@@ -23,3 +23,9 @@ databaseChangeLog:
       file: /db/changelog/versions/0.1.1-clear-data.sql
   - include:
       file: /db/changelog/versions/0.1.2-add-productphotos_db.sql
+  - include:
+      file: /db/changelog/versions/0.1.3-add-reviews_count.sql
+  - include:
+      file: /db/changelog/versions/0.1.4-edit_constraint-description.sql
+  - include:
+      file: /db/changelog/versions/0.1.5-add-test_data.sql

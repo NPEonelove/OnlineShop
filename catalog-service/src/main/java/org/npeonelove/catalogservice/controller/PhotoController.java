@@ -1,7 +1,8 @@
 package org.npeonelove.catalogservice.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
-import org.npeonelove.catalogservice.dto.photo.GetPhoto;
+import org.npeonelove.catalogservice.dto.photo.GetPhotoDTO;
 import org.npeonelove.catalogservice.service.PhotoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/photo")
 @RequiredArgsConstructor
+@Hidden
 public class PhotoController {
 
     private final PhotoService photoService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<GetPhoto>> getProductPhotos(@PathVariable("id") Long id) {
+    public ResponseEntity<List<GetPhotoDTO>> getProductPhotos(@PathVariable("id") Long id) {
         return ResponseEntity.ok(photoService.getProductPhotos(id));
     }
 

@@ -19,3 +19,5 @@ databaseChangeLog:
       file: /db/changelog/versions/profiles/0.0.9-remove-passwordLengthLimit.sql
   - include:
       file: /db/changelog/versions/profiles/0.0.10-add_index-by_email.sql
+  - include:
+      file: /db/changelog/versions/profiles/0.0.11-add-admin_profile.sql

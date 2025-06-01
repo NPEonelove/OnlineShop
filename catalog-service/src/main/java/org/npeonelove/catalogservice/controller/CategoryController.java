@@ -1,11 +1,12 @@
 package org.npeonelove.catalogservice.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.npeonelove.catalogservice.dto.category.AddCategory;
-import org.npeonelove.catalogservice.dto.category.EditCategory;
-import org.npeonelove.catalogservice.dto.category.GetCategory;
-import org.npeonelove.catalogservice.dto.product.GetCardProduct;
+import org.npeonelove.catalogservice.dto.category.AddCategoryDTO;
+import org.npeonelove.catalogservice.dto.category.EditCategoryDTO;
+import org.npeonelove.catalogservice.dto.category.GetCategoryDTO;
+import org.npeonelove.catalogservice.dto.product.GetCardProductDTO;
 import org.npeonelove.catalogservice.exception.category.CategoryNotCreatedException;
 import org.npeonelove.catalogservice.exception.category.CategoryNotEditedException;
 import org.npeonelove.catalogservice.service.CategoryService;
@@ -20,21 +21,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/category")
 @RequiredArgsConstructor
+@Hidden
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<GetCategory>> getCategories() {
-        return ResponseEntity.ok(categoryService.findAll());
+    // получить все существующие категории
+    @GetMapping("/get-all-exists-categories")
+    public ResponseEntity<List<GetCategoryDTO>> getCategories() {
+        return ResponseEntity.ok(categoryService.findAllCategories());
     }
 
-    @GetMapping
-    public ResponseEntity<List<GetCardProduct>> getProductsByCategory(@RequestBody GetCategory getCategory) {
-        return ResponseEntity.ok(categoryService.findByName(getCategory.getName()));
+    // получить все продукты категории
+    @GetMapping("/get-products-by-category")
+    public ResponseEntity<List<GetCardProductDTO>> getProductsByCategory(@RequestBody GetCategoryDTO getCategoryDTO) {
+        return ResponseEntity.ok(categoryService.findProductsByCategoryName(getCategoryDTO.getName()));
     }
 
-    @PostMapping
-    public ResponseEntity<AddCategory> addCategory(@RequestBody @Valid AddCategory addCategory, BindingResult bindingResult) {
+    // создать новую категорию
+    @PostMapping("/create-category")
+    public ResponseEntity<AddCategoryDTO> createCategory(@RequestBody @Valid AddCategoryDTO addCategoryDTO,
+                                                         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -43,12 +49,14 @@ public class CategoryController {
             }
             throw new CategoryNotCreatedException(errorMsg.toString());
         }
-        return ResponseEntity.ok(categoryService.addCategory(addCategory));
+        return ResponseEntity.ok(categoryService.addCategory(addCategoryDTO));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<EditCategory> editCategory(@PathVariable Long id, @RequestBody @Valid EditCategory editCategory,
-                                                     BindingResult bindingResult) {
+    // отредактировать категорию по id
+    @PatchMapping("/edit-category-by-id/{id}")
+    public ResponseEntity<EditCategoryDTO> editCategory(@PathVariable("id") Long id,
+                                                        @RequestBody @Valid EditCategoryDTO editCategoryDTO,
+                                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -57,10 +65,11 @@ public class CategoryController {
             }
             throw new CategoryNotEditedException(errorMsg.toString());
         }
-        return ResponseEntity.ok(categoryService.editCategory(id, editCategory));
+        return ResponseEntity.ok(categoryService.editCategory(id, editCategoryDTO));
     }
 
-    @DeleteMapping("/{id}")
+    // удалить категорию по id
+    @DeleteMapping("/delete-category-by-id/{id}")
     public ResponseEntity<HttpStatus> deleteCategory(@PathVariable("id") Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok(HttpStatus.OK);

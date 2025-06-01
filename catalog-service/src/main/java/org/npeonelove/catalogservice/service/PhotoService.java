@@ -1,8 +1,8 @@
 package org.npeonelove.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.npeonelove.catalogservice.client.MediaClient;
-import org.npeonelove.catalogservice.dto.photo.GetPhoto;
+import org.npeonelove.catalogservice.client.MediaFeignClient;
+import org.npeonelove.catalogservice.dto.photo.GetPhotoDTO;
 import org.npeonelove.catalogservice.exception.photo.PhotoNotExistsException;
 import org.npeonelove.catalogservice.exception.product.ProductNotExistsException;
 import org.npeonelove.catalogservice.model.Photo;
@@ -25,7 +25,7 @@ public class PhotoService {
 
     private final PhotoRepository photoRepository;
     private final ProductRepository productRepository;
-    private final MediaClient mediaClient;
+    private final MediaFeignClient mediaFeignClient;
 
     @Transactional
     public void saveProductPhotos(long id, MultipartFile[] files) {
@@ -33,7 +33,7 @@ public class PhotoService {
         if (product.isEmpty()) {
             throw new ProductNotExistsException("Product not found");
         }
-        List<String> links = mediaClient.uploadMedia("catalog/productPhotos", files);
+        List<String> links = mediaFeignClient.uploadMedia("catalog/productPhotos", files);
 
 
         for (String link : links) {
@@ -44,24 +44,24 @@ public class PhotoService {
         }
     }
 
-    public List<GetPhoto> getProductPhotos(long id) {
+    public List<GetPhotoDTO> getProductPhotos(long id) {
         List<Photo> photos = photoRepository.findPhotoByProductId(id);
-        List<GetPhoto> getPhotos = new ArrayList<>();
+        List<GetPhotoDTO> getPhotoDTOS = new ArrayList<>();
         for (Photo photo : photos) {
-            GetPhoto getPhoto = new GetPhoto();
-            getPhoto.setId(photo.getId());
-            getPhoto.setProductId(photo.getProduct().getId());
-            getPhoto.setPhotolink(photo.getPhotoLink());
-            getPhotos.add(getPhoto);
+            GetPhotoDTO getPhotoDTO = new GetPhotoDTO();
+            getPhotoDTO.setId(photo.getId());
+            getPhotoDTO.setProductId(photo.getProduct().getId());
+            getPhotoDTO.setPhotolink(photo.getPhotoLink());
+            getPhotoDTOS.add(getPhotoDTO);
         }
-        return getPhotos;
+        return getPhotoDTOS;
     }
 
     @Transactional
     public void deleteAllProductPhotos(long id) {
         List<Photo> photos = photoRepository.findPhotoByProductId(id);
         for (Photo photo : photos) {
-            mediaClient.deleteMedia(Collections.singletonList(photo.getPhotoLink()).toArray(new String[0]));
+            mediaFeignClient.deleteMedia(Collections.singletonList(photo.getPhotoLink()).toArray(new String[0]));
             photoRepository.removePhotoById(photo.getId());
         }
     }
@@ -70,7 +70,7 @@ public class PhotoService {
     public void deletePhotosById(Long[] ids) {
         for (Long id : ids) {
             if (photoRepository.existsById(id)) {
-                mediaClient.deleteMedia(Collections.singletonList(photoRepository.findPhotoById(id).getPhotoLink()).toArray(new String[0]));
+                mediaFeignClient.deleteMedia(Collections.singletonList(photoRepository.findPhotoById(id).getPhotoLink()).toArray(new String[0]));
                 photoRepository.removePhotoById(id);
             } else {
                 throw new PhotoNotExistsException("Photo not found");

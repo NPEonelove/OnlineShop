@@ -1,17 +1,16 @@
 package org.npeonelove.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.modelmapper.ModelMapper;
-import org.npeonelove.catalogservice.client.MediaClient;
-import org.npeonelove.catalogservice.dto.category.GetCategory;
-import org.npeonelove.catalogservice.dto.product.AddProduct;
-import org.npeonelove.catalogservice.dto.product.EditProduct;
-import org.npeonelove.catalogservice.dto.product.GetCardProduct;
-import org.npeonelove.catalogservice.dto.product.GetFullProduct;
+import org.npeonelove.catalogservice.client.MediaFeignClient;
+import org.npeonelove.catalogservice.dto.product.AddProductDTO;
+import org.npeonelove.catalogservice.dto.product.EditProductDTO;
+import org.npeonelove.catalogservice.dto.product.GetCardProductDTO;
+import org.npeonelove.catalogservice.dto.product.GetFullProductDTO;
 import org.npeonelove.catalogservice.exception.category.CategoryNotExistsException;
 import org.npeonelove.catalogservice.exception.product.ProductAlreadyExistsException;
 import org.npeonelove.catalogservice.exception.product.ProductNotExistsException;
+import org.npeonelove.catalogservice.exception.product.ProductPhotoNotExistsException;
 import org.npeonelove.catalogservice.model.Category;
 import org.npeonelove.catalogservice.model.Product;
 import org.npeonelove.catalogservice.repository.CategoryRepository;
@@ -32,87 +31,82 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
-    private final MediaClient mediaClient;
 
-    public List<GetCardProduct> getAllProducts() {
+    // получение всех карточек товаров
+    // TODO: добавить пагинацию
+    public List<GetCardProductDTO> getAllProducts() {
         return productRepository.findAll().stream().map(product ->
-                modelMapper.map(product, GetCardProduct.class)).collect(Collectors.toList());
+                modelMapper.map(product, GetCardProductDTO.class)).collect(Collectors.toList());
     }
 
-    @SneakyThrows
-    @Transactional
-    public void addProduct(MultipartFile file, AddProduct addProduct) {
+    // получение 12 товаров для главной страницы
+    public List<GetCardProductDTO> getProductsForMainPage() {
+        return productRepository.findProductsForMainPage().stream().map(product ->
+                modelMapper.map(product, GetCardProductDTO.class)).toList();
+    }
 
-        if (productRepository.findByName(addProduct.getName()) != null) {
+    // добавление нового товара
+    @Transactional
+    public void addProduct(AddProductDTO addProductDTO) {
+        if (productRepository.findByName(addProductDTO.getName()) != null) {
             throw new ProductAlreadyExistsException("Product already exists");
         }
 
-        Product product = mapAddProduct(addProduct);
-
-        String linkPhoto = mediaClient.uploadMedia("catalog/productCard", Collections.singletonList(file)
-                .toArray(new MultipartFile[0])).getFirst();
-        product.setPhoto(linkPhoto);
+        Product product = modelMapper.map(addProductDTO, Product.class);
+        if (addProductDTO.getCategories() != null) {
+            product.setCategories(getCategoryList(addProductDTO.getCategories()));
+        }
 
         productRepository.save(product);
     }
 
-    @SneakyThrows
+    // получение всех данных о товаре
+    public GetFullProductDTO getProduct(Long id) {
+        Product product = productRepository.findProductById(id).orElseThrow(() -> new ProductNotExistsException("Product does not exist"));
+        return modelMapper.map(product, GetFullProductDTO.class);
+    }
+
+    // редактирование товара по id
     @Transactional
-    public void addProduct(AddProduct addProduct) {
-        if (productRepository.findByName(addProduct.getName()) != null) {
-            throw new ProductAlreadyExistsException("Product already exists");
+    public void editProduct(Long id, EditProductDTO editProductDTO) {
+
+        checkProductNameUnique(id, editProductDTO.getName());
+
+        Product product = productRepository.findProductById(id).orElseThrow(() -> new ProductNotExistsException("Product does not exist"));
+        product.setName(editProductDTO.getName());
+        product.setDescription(editProductDTO.getDescription());
+        product.setPrice(editProductDTO.getPrice());
+        product.setCount(editProductDTO.getCount());
+        if (editProductDTO.getCategories() != null) {
+            product.setCategories(getCategoryList(editProductDTO.getCategories()));
         }
 
-        productRepository.save(mapAddProduct(addProduct));
+        productRepository.save(product);
     }
 
-    @SneakyThrows
-    private Product mapAddProduct(AddProduct addProduct) {
+    // удаление товара по id
+    @Transactional
+    public void deleteProduct(Long id) {
+        if (productRepository.findProductById(id).isEmpty()) {
+            throw new ProductNotExistsException("Product does not exist");
+        }
+        productRepository.deleteById(id);
+    }
 
-        Product product = new Product();
-        product.setName(addProduct.getName());
-        product.setDescription(addProduct.getDescription());
-        product.setPrice(addProduct.getPrice());
-        product.setCount(addProduct.getCount());
-
-        List<GetCategory> categories = addProduct.getCategories();
-        if (categories != null && !categories.isEmpty()) {
-            List<Category> categoryList = new ArrayList<>();
-            for (GetCategory getCategory : categories) {
-                categoryList.add(categoryRepository.findByName(modelMapper.map(getCategory, Category.class).getName()));
+    // получение всех категорий как объектов
+    private List<Category> getCategoryList(long[] categoriesIds) {
+        List<Category> categories = new ArrayList<>();
+        if (categoriesIds.length == 0) {
+            return Collections.emptyList();
+        } else {
+            for (long i : categoriesIds) {
+                categories.add(categoryRepository.findCategoryById(i));
             }
-
-            product.setCategories(categoryList);
+            return categories;
         }
-
-        return product;
     }
 
-    public GetFullProduct getProduct(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotExistsException("Product does not exist"));
-        return modelMapper.map(product, GetFullProduct.class);
-    }
-
-    private Product mapEditProduct(Long id, EditProduct updateProduct) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotExistsException("Product does not exist"));
-        product.setName(updateProduct.getName());
-        product.setDescription(updateProduct.getDescription());
-        product.setPrice(updateProduct.getPrice());
-        product.setCount(updateProduct.getCount());
-        List<GetCategory> categories = updateProduct.getCategories();
-        if (categories != null && !categories.isEmpty()) {
-            List<Category> categoryList = new ArrayList<>();
-
-            for (GetCategory getCategory : categories) {
-                categoryList.add(categoryRepository.findByName(modelMapper.map(getCategory, Category.class).getName()));
-            }
-
-            product.setCategories(categoryList);
-        }
-
-        return product;
-    }
-
+    // проверка для редактирования объекта
     private void checkProductNameUnique(Long id, String name) {
         if (productRepository.findById(id).isEmpty()) {
             throw new CategoryNotExistsException("Product with this id does not exist");
@@ -127,41 +121,30 @@ public class ProductService {
         }
     }
 
-    @SneakyThrows
+    // потом будет удалено
+    private final MediaFeignClient mediaFeignClient;
+
     @Transactional
-    public void editProduct(Long id, EditProduct updateProduct) {
-
-        checkProductNameUnique(id, updateProduct.getName());
-
-        Product product = mapEditProduct(id, updateProduct);
-
-        product.setPhoto(updateProduct.getPhoto());
-
-        productRepository.save(product);
-    }
-
-    @SneakyThrows
-    @Transactional
-    public void editProduct(Long id, MultipartFile file, EditProduct updateProduct) {
-
-        checkProductNameUnique(id, updateProduct.getName());
-
-        Product product = mapEditProduct(id, updateProduct);
-
+    public String addProductPhoto(Long id, MultipartFile image) {
+        String photoLink = mediaFeignClient.uploadMedia("catalog/productCard", new MultipartFile[]{image}).getFirst();
+        Product product = productRepository.findProductById(id).get();
         if (product.getPhoto() != null) {
-            mediaClient.deleteMedia(Collections.singletonList(product.getPhoto()).toArray(new String[0]));
+            deleteProductPhotoByProductId(product.getId());
         }
-        String photo = mediaClient.uploadMedia("catalog/productCard", Collections.singletonList(file)
-                .toArray(new MultipartFile[0])).getFirst();
-        product.setPhoto(photo);
-
+        product.setPhoto(photoLink);
         productRepository.save(product);
+        return photoLink;
     }
 
     @Transactional
-    public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotExistsException("Product does not exist"));
-        mediaClient.deleteMedia(Collections.singletonList(product.getPhoto()).toArray(new String[0]));
-        productRepository.deleteById(id);
+    public void deleteProductPhotoByProductId(Long id) {
+        Product product = productRepository.findProductById(id).get();
+        if (product.getPhoto() != null) {
+            mediaFeignClient.deleteMedia(new String[]{product.getPhoto()});
+        } else {
+            throw new ProductPhotoNotExistsException("Product photo does not exist");
+        }
+        product.setPhoto(null);
+        productRepository.save(product);
     }
 }

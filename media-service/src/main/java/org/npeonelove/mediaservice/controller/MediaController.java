@@ -19,7 +19,7 @@ public class MediaController {
     @SneakyThrows
     @PostMapping
     public ResponseEntity<List<String>> uploadMedia(@RequestPart("directory") String directory,
-                                                    @RequestPart("file") MultipartFile[] files) {
+                                                    @RequestPart("images") MultipartFile[] files) {
         return ResponseEntity.ok(mediaService.uploadFiles(directory, files));
     }
 

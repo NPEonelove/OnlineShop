@@ -2,13 +2,13 @@ package org.npeonelove.catalogservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.npeonelove.catalogservice.dto.product.AddProduct;
-import org.npeonelove.catalogservice.dto.product.EditProduct;
-import org.npeonelove.catalogservice.dto.product.GetCardProduct;
-import org.npeonelove.catalogservice.dto.product.GetFullProduct;
+import org.npeonelove.catalogservice.dto.product.AddProductDTO;
+import org.npeonelove.catalogservice.dto.product.EditProductDTO;
+import org.npeonelove.catalogservice.dto.product.GetCardProductDTO;
+import org.npeonelove.catalogservice.dto.product.GetFullProductDTO;
 import org.npeonelove.catalogservice.exception.product.ProductNotCreatedException;
 import org.npeonelove.catalogservice.exception.product.ProductNotEditedException;
+import org.npeonelove.catalogservice.service.PhotoService;
 import org.npeonelove.catalogservice.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +25,23 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping
-    public ResponseEntity<List<GetCardProduct>> getAllProducts() {
+    // получение всех карточек товаров
+    // TODO: добавить пагинацию
+    @GetMapping("/get-all-products")
+    public ResponseEntity<List<GetCardProductDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    @SneakyThrows
-    @PostMapping
-    public ResponseEntity<AddProduct> addProduct(@RequestParam(value = "file", required = false) MultipartFile file,
-                                                 @ModelAttribute @Valid AddProduct addProduct, BindingResult bindingResult) {
+    // получение 12 товаров для главной страницы
+    @GetMapping("/get-products-for-main-page")
+    public ResponseEntity<List<GetCardProductDTO>> getProductsForMainPage() {
+        return ResponseEntity.ok(productService.getProductsForMainPage());
+    }
+
+    // добавление нового товара
+    @PostMapping("/add-product")
+    public ResponseEntity<String> addProduct(@RequestBody @Valid AddProductDTO addProductDTO,
+                                             BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
@@ -43,23 +51,22 @@ public class ProductController {
             throw new ProductNotCreatedException(errorMsg.toString());
         }
 
-        if (file == null) {
-            productService.addProduct(addProduct);
-        } else {
-            productService.addProduct(file, addProduct);
-        }
+        productService.addProduct(addProductDTO);
 
-        return ResponseEntity.ok(addProduct);
+        return ResponseEntity.ok("Product added successfully.");
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GetFullProduct> getProduct(@PathVariable("id") Long id) {
+    // получение товара по id
+    @GetMapping("/get-product-by-id/{id}")
+    public ResponseEntity<GetFullProductDTO> getProduct(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getProduct(id));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateProduct(@PathVariable Long id, @RequestParam(value = "file", required = false) MultipartFile file,
-                                                    @ModelAttribute @Valid EditProduct editProduct, BindingResult bindingResult) {
+    // редактирование товара по id
+    @PatchMapping("/edit-product-by-id/{id}")
+    public ResponseEntity<HttpStatus> updateProduct(@PathVariable("id") Long id,
+                                                    @RequestBody @Valid EditProductDTO editProductDTO,
+                                                    BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
@@ -69,17 +76,26 @@ public class ProductController {
             throw new ProductNotEditedException(errorMsg.toString());
         }
 
-        if (file == null) {
-            productService.editProduct(id, editProduct);
-        } else {
-            productService.editProduct(id, file, editProduct);
-        }
+        productService.editProduct(id, editProductDTO);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    // удаление товара по id
+    @DeleteMapping("/delete-product-by-id/{id}")
     public HttpStatus deleteProduct(@PathVariable("id") Long id) {
         productService.deleteProduct(id);
+        return HttpStatus.OK;
+    }
+
+    @PostMapping("/add-product-photo/{id}")
+    public ResponseEntity<String> addProductPhoto(@PathVariable("id") Long id, MultipartFile image) {
+        return ResponseEntity.ok(productService.addProductPhoto(id, image));
+    }
+
+    @DeleteMapping("/delete-product-photo/{id}")
+    public HttpStatus deleteProductPhoto(@PathVariable("id") Long id) {
+        productService.deleteProductPhotoByProductId(id);
         return HttpStatus.OK;
     }
 }

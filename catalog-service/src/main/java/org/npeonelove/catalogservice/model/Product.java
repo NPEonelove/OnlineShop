@@ -38,6 +38,9 @@ public class Product {
     @Column(name = "rating")
     private Double rating;
 
+    @Column(name = "reviews_count")
+    private Integer reviewsCount;
+
     @ManyToMany
     @JoinTable(
             name = "product_category",

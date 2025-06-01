@@ -70,27 +70,6 @@ public class ProfileService {
     }
 
     @Transactional
-    public void editProfile(int id, EditProfile editProfile, MultipartFile file) {
-        if (profileRepository.findProfileById(id) == null) {
-            throw new ProfileDoesNotExistException("Profile does not exist");
-        } else if (!profileRepository.findProfileById(id).getEmail().equals(securityContextService.getEmailFromSecurityContext())) {
-            throw new ProfileNotEditedException("Your email should be unique");
-        } else {
-            Profile profile = profileRepository.findProfileById(id);
-            modelMapper.map(editProfile, profile);
-            if (file != null) {
-                String photoLink = mediaClient.uploadMedia(s3Directory, Collections.singletonList(file)
-                        .toArray(new MultipartFile[0])).getFirst();
-                if (profile.getPhotoLink() != null) {
-                    mediaClient.deleteMedia(new String[]{profile.getPhotoLink()});
-                }
-                profile.setPhotoLink(photoLink);
-            }
-            profileRepository.save(profile);
-        }
-    }
-
-    @Transactional
     public void editProfile(int id, EditProfile editProfile) {
         if (profileRepository.findProfileById(id) == null) {
             throw new ProfileDoesNotExistException("Profile does not exist");
@@ -112,14 +91,4 @@ public class ProfileService {
         return profile.orElse(null);
     }
 }
-
-
-
-
-
-
-
-
-
-
 
