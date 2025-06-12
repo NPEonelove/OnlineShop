@@ -1,11 +1,10 @@
 package org.npeonelove.catalogservice.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.npeonelove.catalogservice.dto.product.AddProductDTO;
-import org.npeonelove.catalogservice.dto.product.EditProductDTO;
-import org.npeonelove.catalogservice.dto.product.GetCardProductDTO;
-import org.npeonelove.catalogservice.dto.product.GetFullProductDTO;
+import org.npeonelove.catalogservice.dto.PayForProductRequestDTO;
+import org.npeonelove.catalogservice.dto.product.*;
 import org.npeonelove.catalogservice.exception.product.ProductNotCreatedException;
 import org.npeonelove.catalogservice.exception.product.ProductNotEditedException;
 import org.npeonelove.catalogservice.service.PhotoService;
@@ -88,14 +87,29 @@ public class ProductController {
         return HttpStatus.OK;
     }
 
+    // добавить/обновить фото товара
     @PostMapping("/add-product-photo/{id}")
     public ResponseEntity<String> addProductPhoto(@PathVariable("id") Long id, MultipartFile image) {
         return ResponseEntity.ok(productService.addProductPhoto(id, image));
     }
 
+    // удалить фото товара
     @DeleteMapping("/delete-product-photo/{id}")
     public HttpStatus deleteProductPhoto(@PathVariable("id") Long id) {
         productService.deleteProductPhotoByProductId(id);
         return HttpStatus.OK;
+    }
+
+    // получить товары для корзины
+    @GetMapping("/get-products-for-cart")
+    @Hidden
+    public ResponseEntity<List<CartProductDTO>> getProductsForCart(@RequestParam("ids") List<Long> ids) {
+        return ResponseEntity.ok(productService.getProductsForCart(ids));
+    }
+
+    @PostMapping("/pay-for-product")
+    @Hidden
+    public void payForProduct(@RequestBody PayForProductRequestDTO payForProductRequestDTO) {
+        productService.payForProduct(payForProductRequestDTO);
     }
 }

@@ -43,15 +43,12 @@ public class ProfileController {
         return ResponseEntity.ok(profileCredentials);
     }
 
-    @GetMapping("/get-profile-by-id/{id}")
+    @GetMapping("/get-profile")
     @Operation(
-            summary = "Получить профиль по ID"
+            summary = "Получить профиль (просто отправить авторизованный запрос)"
     )
-    public ResponseEntity<GetProfile> getProfile(
-            @Parameter(description = "ID профиля", required = true)
-            @PathVariable("id") int id
-    ) {
-        return ResponseEntity.ok(profileService.getProfile(id));
+    public ResponseEntity<GetProfile> getProfile() {
+        return ResponseEntity.ok(profileService.getProfile());
     }
 
     @PatchMapping("/edit-profile-by-id/{id}")

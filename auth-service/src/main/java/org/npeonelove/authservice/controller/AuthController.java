@@ -28,7 +28,6 @@ public class AuthController {
     )
     @PostMapping("/sign-up")
     public ResponseEntity<JwtAuthenticationDTO> signUp(@RequestBody ProfileCredentialsDTO profile) {
-        System.out.println("11111111111");
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signUp(profile));
     }
 

@@ -34,7 +34,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
@@ -62,7 +62,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*")); // Или конкретные домены
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("X-Profile-Email", "X-Profile-Role", "Content-Type"));
+        config.setAllowedHeaders(List.of("X-Profile-Email", "X-Profile-Role", "Content-Type", "Authorization"));
+
         config.setAllowCredentials(true); // Если используете куки
         config.setExposedHeaders(List.of("X-Profile-Email", "X-Profile-Role")); // Важно для клиента!
 

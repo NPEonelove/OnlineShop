@@ -45,9 +45,10 @@ public class ProfileService {
         profileRepository.save(profile);
     }
 
-    // получение профиля по id
-    public GetProfile getProfile(int id) {
-        Profile profile = profileRepository.findProfileById(id);
+    // получение профиля (через авторизованный запрос)
+    public GetProfile getProfile() {
+        Profile profile = profileRepository.findProfileByEmail(securityContextService.getEmailFromSecurityContext())
+                .orElse(null);
         if (profile == null) {
             throw new ProfileDoesNotExistException("Profile does not exist");
         }

@@ -3,10 +3,8 @@ package org.npeonelove.catalogservice.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.npeonelove.catalogservice.client.MediaFeignClient;
-import org.npeonelove.catalogservice.dto.product.AddProductDTO;
-import org.npeonelove.catalogservice.dto.product.EditProductDTO;
-import org.npeonelove.catalogservice.dto.product.GetCardProductDTO;
-import org.npeonelove.catalogservice.dto.product.GetFullProductDTO;
+import org.npeonelove.catalogservice.dto.PayForProductRequestDTO;
+import org.npeonelove.catalogservice.dto.product.*;
 import org.npeonelove.catalogservice.exception.category.CategoryNotExistsException;
 import org.npeonelove.catalogservice.exception.product.ProductAlreadyExistsException;
 import org.npeonelove.catalogservice.exception.product.ProductNotExistsException;
@@ -118,6 +116,27 @@ public class ProductService {
             if (!product.getId().equals(id)) {
                 throw new CategoryNotExistsException("Product with this name already exist");
             }
+        }
+    }
+
+    // получение списка товаров для корзины
+    public List<CartProductDTO> getProductsForCart(List<Long> cartIds) {
+        List<CartProductDTO> cartProductDTOList = new ArrayList<>();
+        for (Long id : cartIds) {
+            cartProductDTOList.add(modelMapper.map(productRepository.findProductById(id), CartProductDTO.class));
+        }
+        return cartProductDTOList;
+    }
+
+
+    // изменение количества товаров (для оплаты корзины)
+    @Transactional
+    public void payForProduct(PayForProductRequestDTO payForProductRequestDTO) {
+        Product product = productRepository.findProductById(Long.valueOf(payForProductRequestDTO.getProductId())).orElse(null);
+        if (product != null) {
+            product.setCount(product.getCount() - payForProductRequestDTO.getQuantity());
+            System.out.println(product.getDescription());
+            productRepository.save(product);
         }
     }
 
