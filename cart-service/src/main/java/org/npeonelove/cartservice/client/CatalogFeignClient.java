@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "catalog-service", url = "http://localhost:8081/catalog")
+@FeignClient(name = "catalog-service")
 public interface CatalogFeignClient {
 
-    @GetMapping("/product/get-products-for-cart")
+    @GetMapping("/catalog/product/get-products-for-cart")
     List<CartProductDTO> getProductsForCart(@RequestParam("ids") List<Long> ids);
 
-    @PostMapping("/product/pay-for-product")
+    @PostMapping("/catalog/product/pay-for-product")
     void payForProduct(@RequestBody PayForProductRequestDTO payForProductRequestDTO);
 
 }

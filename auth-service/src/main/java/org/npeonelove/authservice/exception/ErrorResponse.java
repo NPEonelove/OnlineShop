@@ -9,8 +9,9 @@ import java.util.Date;
 @Setter
 @Getter
 @AllArgsConstructor
-public class AuthErrorResponse {
-    String message;
+public class ErrorResponse {
     int status;
+    String message;
     Date timestamp;
+    private String details;
 }

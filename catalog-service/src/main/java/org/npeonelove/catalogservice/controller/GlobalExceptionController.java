@@ -1,74 +1,72 @@
 package org.npeonelove.catalogservice.controller;
 
-import org.npeonelove.catalogservice.exception.CategoryErrorResponse;
-import org.npeonelove.catalogservice.exception.PhotoErrorResponse;
-import org.npeonelove.catalogservice.exception.ProductErrorResponse;
-import org.npeonelove.catalogservice.exception.category.CategoryAlreadyExistsException;
-import org.npeonelove.catalogservice.exception.category.CategoryNotCreatedException;
-import org.npeonelove.catalogservice.exception.category.CategoryNotEditedException;
-import org.npeonelove.catalogservice.exception.category.CategoryNotExistsException;
+import org.npeonelove.catalogservice.exception.ErrorResponse;
+import org.npeonelove.catalogservice.exception.category.*;
 import org.npeonelove.catalogservice.exception.photo.PhotoNotExistsException;
 import org.npeonelove.catalogservice.exception.product.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionController {
 
-    //product
+    private ResponseEntity<ErrorResponse> buildErrorResponse(Exception ex, HttpStatus status, WebRequest request) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        status.value(),
+                        ex.getMessage(),
+                        new Date(),
+                        request.getDescription(false)
+                ),
+                status
+        );
+    }
+
+    // Product exceptions
     @ExceptionHandler(ProductNotCreatedException.class)
-    public ResponseEntity<ProductErrorResponse> handleProductNotCreatedException(ProductNotCreatedException ex) {
-        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), new Date()), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> handleProductNotCreated(ProductNotCreatedException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ResponseEntity<ProductErrorResponse> handleProductNotCreatedException(ProductAlreadyExistsException ex) {
-        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), new Date()), HttpStatus.CONFLICT);
+    @ExceptionHandler({ProductAlreadyExistsException.class, ProductNotEditedException.class})
+    public ResponseEntity<ErrorResponse> handleProductConflictExceptions(RuntimeException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, request);
     }
 
-    @ExceptionHandler(ProductNotExistsException.class)
-    public ResponseEntity<ProductErrorResponse> handleProductNotExistsException(ProductNotExistsException ex) {
-        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), new Date()), HttpStatus.NOT_FOUND);
+    @ExceptionHandler({ProductNotExistsException.class, ProductPhotoNotExistsException.class})
+    public ResponseEntity<ErrorResponse> handleProductNotFoundExceptions(RuntimeException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
-    @ExceptionHandler(ProductNotEditedException.class)
-    public ResponseEntity<ProductErrorResponse> handleProductNotExistsException(ProductNotEditedException ex) {
-        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), new Date()), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ProductPhotoNotExistsException.class)
-    public ResponseEntity<ProductErrorResponse> handleProductNotExistsException(ProductPhotoNotExistsException ex) {
-        return new ResponseEntity<>(new ProductErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), new Date()), HttpStatus.NOT_FOUND);
-    }
-
-    //category
-    @ExceptionHandler(CategoryNotCreatedException.class)
-    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotCreatedException ex) {
-        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), new Date()), HttpStatus.CONFLICT);
+    // Category exceptions
+    @ExceptionHandler({CategoryNotCreatedException.class, CategoryNotEditedException.class, CategoryAlreadyExistsException.class})
+    public ResponseEntity<ErrorResponse> handleCategoryConflictExceptions(RuntimeException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, request);
     }
 
     @ExceptionHandler(CategoryNotExistsException.class)
-    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotExistsException ex) {
-        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), new Date()), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handleCategoryNotFound(CategoryNotExistsException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
-    @ExceptionHandler(CategoryAlreadyExistsException.class)
-    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryAlreadyExistsException ex) {
-        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), new Date()), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(CategoryNotEditedException.class)
-    public ResponseEntity<CategoryErrorResponse> handleProductNotExistsException(CategoryNotEditedException ex) {
-        return new ResponseEntity<>(new CategoryErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), new Date()), HttpStatus.CONFLICT);
-    }
-
-    //photo
+    // Photo exceptions
     @ExceptionHandler(PhotoNotExistsException.class)
-    public ResponseEntity<PhotoErrorResponse> handleProductNotExistsException(PhotoNotExistsException ex) {
-        return new ResponseEntity<>(new PhotoErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), new Date()), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponse> handlePhotoNotFound(PhotoNotExistsException ex, WebRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
+    }
+
+    // Global catch-all handler
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAllUncaughtExceptions(Exception ex, WebRequest request) {
+        return buildErrorResponse(
+                ex,
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                request
+        );
     }
 }

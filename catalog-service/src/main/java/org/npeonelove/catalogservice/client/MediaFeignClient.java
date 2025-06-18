@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@FeignClient(name = "media-service", url = "http://localhost:8082")
+@FeignClient(name = "media-service")
 public interface MediaFeignClient {
 
     // возвращает список из ссылок на добавленные объекты

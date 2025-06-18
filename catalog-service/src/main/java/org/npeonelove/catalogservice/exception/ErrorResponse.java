@@ -9,8 +9,11 @@ import java.util.Date;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CategoryErrorResponse {
-    String message;
-    int status;
-    Date timestamp;
+public class ErrorResponse {
+
+    private int status;
+    private String message;
+    private Date timestamp;
+    private String details;
+
 }
