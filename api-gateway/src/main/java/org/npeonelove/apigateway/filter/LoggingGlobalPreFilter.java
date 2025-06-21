@@ -15,7 +15,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -61,6 +60,8 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
                     .header("X-Profile-Email", getEmailFromToken(token))
                     .header("X-Profile-Role", getRoleFromToken(token))
                     .build();
+
+            
 
             ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
 

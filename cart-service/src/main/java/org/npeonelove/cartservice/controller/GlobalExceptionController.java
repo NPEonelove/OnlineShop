@@ -1,6 +1,7 @@
 package org.npeonelove.cartservice.controller;
 
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.npeonelove.cartservice.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Date;
 
 @ControllerAdvice
+@Hidden
 public class GlobalExceptionController {
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(Exception ex, HttpStatus status, String prefix, WebRequest request) {
